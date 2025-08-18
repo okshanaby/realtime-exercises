@@ -23,7 +23,8 @@ app.use(express.static("frontend"));
 app.get("/poll", function (req, res) {
   const messages = getMsgs();
 
-  res.json({ success: true, messages });
+  // mocking request fail with status code
+  res.status(Math.random() > 0.5 ? 200 : 500).json({ success: true, messages });
 });
 
 app.post("/poll", function (req, res) {
