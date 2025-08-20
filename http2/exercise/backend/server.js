@@ -1,9 +1,9 @@
-import http2 from "http2";
 import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-import handler from "serve-handler";
+import http2 from "http2";
 import nanobuffer from "nanobuffer";
+import path from "path";
+import handler from "serve-handler";
+import { fileURLToPath } from "url";
 
 let connections = [];
 
@@ -29,11 +29,27 @@ const server = http2.createSecureServer({
   key: fs.readFileSync(path.join(__dirname, "/../key.pem")),
 });
 
-/*
- *
- * Code goes here
- *
- */
+server.on("stream", (stream, headers) => {
+  const path = headers[":path"];
+  const method = headers[":method"];
+
+  if (path === "/msgs" && method === "GET") {
+    console.log("Connected a stream: " + stream.id);
+    
+    stream.respond({
+      ":status": 200,
+      "content-type": "text/plain; charset=utf-8",
+    });
+  
+    // write the first response
+    stream.write(JSON.stringify({ msg: getMsgs() }));
+  }
+
+
+  stream.on("close", () => {
+    console.log("Disconnected " + stream.id);
+  });
+});
 
 server.on("request", async (req, res) => {
   const path = req.headers[":path"];
