@@ -14,11 +14,11 @@ async function postNewMsg(user, text) {
   // code goes here
 }
 
-/*
- *
- * your code goes here
- *
- */
+const ws = new WebSocket("ws://localhost:8080", ["json"]);
+ws.addEventListener("open", () => {
+  console.log("Connected");
+  presence.innerHTML = "Connected";
+});
 
 function render() {
   const html = allChat.map(({ user, text }) => template(user, text));
