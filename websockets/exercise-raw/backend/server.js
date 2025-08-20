@@ -1,6 +1,6 @@
 import http from "http";
-import handler from "serve-handler";
 import nanobuffer from "nanobuffer";
+import handler from "serve-handler";
 
 // these are helpers to help you deal with the binary data that websockets use
 import objToResponse from "./obj-to-response.js";
@@ -24,11 +24,27 @@ const server = http.createServer((request, response) => {
   });
 });
 
-/*
- *
- * your code goes here
- *
- */
+server.on("upgrade", (req, socket) => {
+  if (req.headers["upgrade"] !== "websocket") {
+    socket.end("HTTP/1.1 400 Bad Request");
+    return;
+  }
+
+  const acceptKey = req.headers["sec-websocket-key"]
+  const acceptValue = generateAcceptValue(acceptKey)
+
+  const headers = [
+    "HTTP/1.1 101 Web Socket Protocal Handshake",
+    "Upgrade: WebSocket",
+    "Connection: Upgrade",
+    `Sec-WebSocket-Accept: ${acceptValue}`,
+    "Sec-WebSocket-Protocol: json",
+    "\r\n"
+  ]
+
+  socket.write(headers.join("\r\n"))
+  console.log("Upgrade requested");
+});
 
 const port = process.env.PORT || 8080;
 server.listen(port, () =>

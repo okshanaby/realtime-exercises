@@ -15,6 +15,7 @@ async function postNewMsg(user, text) {
 }
 
 const ws = new WebSocket("ws://localhost:8080", ["json"]);
+
 ws.addEventListener("open", () => {
   console.log("Connected");
   presence.innerHTML = "Connected";
