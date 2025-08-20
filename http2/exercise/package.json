@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "start": "node init && node backend/server.js",
+    "dev": "node init && nodemon backend/server.js"
   },
   "keywords": [],
   "type": "module",
