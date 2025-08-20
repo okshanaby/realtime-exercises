@@ -32,11 +32,45 @@ async function postNewMsg(user, text) {
 }
 
 async function getNewMsgs() {
-  /*
-   *
-   * code goes here
-   *
-   */
+  let reader;
+  const utf8decoder = new TextDecoder("utf-8");
+  let readerResponse;
+  let done;
+
+  try {
+    const res = await fetch("/msgs");
+    reader = res.body.getReader();
+
+    presence.innerText = "Connected";
+  } catch (error) {
+    console.log("🚀 ~ getNewMsgs ~ connection error:", error);
+    presence.innerText = "Disonnected";
+  }
+
+  do {
+    try {
+      readerResponse = await reader.read();
+    } catch (error) {
+      console.log("🚀 ~ getNewMsgs ~ reader error:", error);
+      presence.innerText = "Disonnected";
+
+      return;
+    }
+
+    const chunk = utf8decoder.decode(readerResponse.value, { stream: true });
+    done = readerResponse.done;
+
+    if (chunk) {
+      try {
+        const json = JSON.parse(chunk);
+        allChat = json.msg;
+        render();
+      } catch (error) {
+        console.log("🚀 ~ getNewMsgs ~ parse error:", error);
+      }
+    }
+  } while (!done);
+  presence.innerText = "Disonnected";
 }
 
 function render() {
