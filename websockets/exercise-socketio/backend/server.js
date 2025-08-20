@@ -24,6 +24,17 @@ const io = new Server(server, {});
 io.on("connection", (socket) => {
   console.log("Connected: " + socket.id);
 
+  socket.emit("msg:get", { msg: getMsgs() });
+
+  socket.on("msg:post", (data) => {
+    msg.push({
+      ...data,
+      time: Date.now(),
+    });
+
+    io.emit("msg:get", { msg: getMsgs() });
+  });
+
   socket.on("disconnect", () => {
     console.log("Disconnected: " + socket.id);
   });
