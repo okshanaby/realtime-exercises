@@ -29,6 +29,11 @@ ws.addEventListener("message", (event) => {
   render();
 });
 
+ws.addEventListener("close", () => {
+  console.log("Disconnected");
+  presence.innerHTML = "Disconnected";
+});
+
 function render() {
   const html = allChat.map(({ user, text }) => template(user, text));
   msgs.innerHTML = html.join("\n");
