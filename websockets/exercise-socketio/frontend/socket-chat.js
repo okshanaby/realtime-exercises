@@ -16,6 +16,11 @@ socket.on("disconnect", () => {
   presence.innerHTML = "Disconnected";
 });
 
+socket.on("msg:get", (data) => {
+  allChat = data.msg;
+  render();
+});
+
 chat.addEventListener("submit", function (e) {
   e.preventDefault();
   postNewMsg(chat.elements.user.value, chat.elements.text.value);
@@ -23,11 +28,9 @@ chat.addEventListener("submit", function (e) {
 });
 
 async function postNewMsg(user, text) {
-  /*
-   *
-   * Code goes here
-   *
-   */
+  const data = { user, text };
+
+  socket.emit("msg:post", data);
 }
 
 function render() {
