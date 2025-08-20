@@ -1,6 +1,6 @@
 import http from "http";
-import handler from "serve-handler";
 import nanobuffer from "nanobuffer";
+import handler from "serve-handler";
 import { Server } from "socket.io";
 
 const msg = new nanobuffer(50);
@@ -19,11 +19,15 @@ const server = http.createServer((request, response) => {
   });
 });
 
-/*
- *
- * Code goes here
- *
- */
+const io = new Server(server, {});
+
+io.on("connection", (socket) => {
+  console.log("Connected: " + socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Disconnected: " + socket.id);
+  });
+});
 
 const port = process.env.PORT || 8080;
 server.listen(port, () =>
