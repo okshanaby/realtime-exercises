@@ -35,19 +35,20 @@ server.on("stream", (stream, headers) => {
 
   if (path === "/msgs" && method === "GET") {
     console.log("Connected a stream: " + stream.id);
-    
+
     stream.respond({
       ":status": 200,
       "content-type": "text/plain; charset=utf-8",
     });
-  
+
     // write the first response
     stream.write(JSON.stringify({ msg: getMsgs() }));
+    connections.push(stream);
   }
-
 
   stream.on("close", () => {
     console.log("Disconnected " + stream.id);
+    connections.filter((connection) => connection !== stream);
   });
 });
 
@@ -69,11 +70,17 @@ server.on("request", async (req, res) => {
     const data = Buffer.concat(buffers).toString();
     const { user, text } = JSON.parse(data);
 
-    /*
-     *
-     * some code goes here
-     *
-     */
+    msg.push({
+      user,
+      text,
+      time: Date.now(),
+    });
+
+    res.end();
+
+    connections.forEach((stream) => {
+      stream.write(JSON.stringify({ msg: getMsgs() }));
+    });
   }
 });
 
