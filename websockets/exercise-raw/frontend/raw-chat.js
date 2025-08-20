@@ -3,6 +3,8 @@ const msgs = document.getElementById("msgs");
 const presence = document.getElementById("presence-indicator");
 let allChat = [];
 
+const ws = new WebSocket("ws://localhost:8080", ["json"]);
+
 // listen for events on the form
 chat.addEventListener("submit", function (e) {
   e.preventDefault();
@@ -11,14 +13,20 @@ chat.addEventListener("submit", function (e) {
 });
 
 async function postNewMsg(user, text) {
-  // code goes here
-}
+  const data = { user, text };
 
-const ws = new WebSocket("ws://localhost:8080", ["json"]);
+  ws.send(JSON.stringify(data));
+}
 
 ws.addEventListener("open", () => {
   console.log("Connected");
   presence.innerHTML = "Connected";
+});
+
+ws.addEventListener("message", (event) => {
+  const data = JSON.parse(event.data);
+  allChat = data.msg;
+  render();
 });
 
 function render() {
